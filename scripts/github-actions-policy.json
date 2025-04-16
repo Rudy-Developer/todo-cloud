@@ -1,0 +1,17 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "cloudformation:*",
+        "lambda:*",
+        "apigateway:*",
+        "s3:*",
+        "dynamodb:*",
+        "iam:PassRole"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

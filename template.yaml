@@ -1,28 +1,27 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Aplicacion Lambda con API Gateway
+Globals:
+  Function:
+    Timeout: 10
+    Runtime: python3.10
 
 Resources:
   TaskFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: TaskFunction
-      Handler: task.app.lambda_handler
-      Runtime: python3.10
-      Role: arn:aws:iam::413600747077:role/GitHubActionsRole
-      Policies: GitHubActionsRole-ToDoCreate-Role
-      CodeUri: src/lambdas/task/
-      Description: Función Lambda de ejemplo
-      MemorySize: 128
-      Timeout: 5
+      CodeUri: src/lambdas/tasks/
+      Handler: app.lambda_handler
+      Role: arn:aws:iam::${AWS::AccountId}:role/task-lambda-role-${Environment}
       Events:
-        HelloWorld:
+        TaskAPI:
           Type: Api
           Properties:
-            Path: /hello
-            Method: get
+            Path: /tasks
+            Method: ANY
 
-Outputs:
-  HelloWorldApi:
-    Description: "URL de invocación de la API"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  AttachmentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/lambdas/attachments/
+      Handler: app.lambda_handler
+      Role: arn:aws:iam::${AWS::AccountId}:role/attachments-lambda-role-${Environment}

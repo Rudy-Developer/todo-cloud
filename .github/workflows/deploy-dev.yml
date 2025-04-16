@@ -1,29 +1,26 @@
-name: Deploy to Dev ToDo
+name: Deploy to AWS
 
 on:
   push:
-    branches:
-      - dev
+    branches: [dev]
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
 
     steps:
-      - name: Clonar el repositorio
-        uses: actions/checkout@v3
+      - name: Checkout source code
+        uses: actions/checkout@v4
 
-      - name: Configurar credenciales de AWS
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: arn:aws:iam::413600747077:role/GitHubActionsRole-ToDo
           aws-region: us-east-2
-
-      - name: Instalar AWS SAM CLI
-        uses: aws-actions/setup-sam@v1
 
       - name: Instalar Python 3.10
         uses: actions/setup-python@v4
@@ -33,36 +30,12 @@ jobs:
       - name: Verificar versión de Python
         run: python --version
 
-      - name: Verificar y eliminar pila en estado ROLLBACK_COMPLETE
-        run: |
-          STACK_STATUS=$(aws cloudformation describe-stacks --stack-name todo-stack --query "Stacks[0].StackStatus" --output text || echo "STACK_NOT_FOUND")
-          if [ "$STACK_STATUS" = "ROLLBACK_COMPLETE" ]; then
-            echo "La pila está en estado ROLLBACK_COMPLETE. Eliminando la pila..."
-            aws cloudformation delete-stack --stack-name todo-stack
-            echo "Esperando a que la pila se elimine completamente..."
-            aws cloudformation wait stack-delete-complete --stack-name todo-stack
-            echo "La pila ha sido eliminada."
-          else
-            echo "La pila no está en estado ROLLBACK_COMPLETE. Continuando con el despliegue..."
-          fi
+      - name: Install AWS SAM CLI
+        uses: aws-actions/setup-sam@v2
 
-      - name: Construir la aplicación
+      - name: Build SAM
         run: SAM_CLI_TELEMETRY=0 sam build
 
-      - name: Desplegar la aplicación
+      - name: Deploy to AWS
         run: |
-          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset \
-            --s3-bucket todo-cloud-demo \
-            --stack-name todo-stack \
-            --capabilities CAPABILITY_IAM \
-            --region us-east-2
-
-      - name: Obtener la URL de la API
-        run: |
-          aws cloudformation describe-stacks \
-            --stack-name todo-stack \
-            --query "Stacks[0].Outputs[?OutputKey=='ToDoApi'].OutputValue" \
-            --output text
-            --disable-rollback
-  
-  
+          sam deploy --config-env default --no-confirm-changeset --no-fail-on-empty-changeset

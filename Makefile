@@ -46,6 +46,7 @@ undeploy:
 # Limpiar los artefactos de construcción
 clean:
 	rm -rf $(BUILD_DIR)
+	rm -rf .aws-sam
 
 # Ayuda
 help:
