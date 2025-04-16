@@ -50,3 +50,4 @@ jobs:
             --stack-name todo-stack \
             --query "Stacks[0].Outputs[?OutputKey=='ToDoApi'].OutputValue" \
             --output text
+            --disable-rollback
