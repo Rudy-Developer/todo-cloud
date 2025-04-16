@@ -34,18 +34,18 @@ jobs:
         run: python --version
 
       - name: Verificar y eliminar pila en estado ROLLBACK_COMPLETE
-              run: |
-                STACK_STATUS=$(aws cloudformation describe-stacks --stack-name todo-stack --query "Stacks[0].StackStatus" --output text || echo "STACK_NOT_FOUND")
-                if [ "$STACK_STATUS" = "ROLLBACK_COMPLETE" ]; then
-                  echo "La pila está en estado ROLLBACK_COMPLETE. Eliminando la pila..."
-                  aws cloudformation delete-stack --stack-name todo-stack
-                  echo "Esperando a que la pila se elimine completamente..."
-                  aws cloudformation wait stack-delete-complete --stack-name todo-stack
-                  echo "La pila ha sido eliminada."
-                else
-                  echo "La pila no está en estado ROLLBACK_COMPLETE. Continuando con el despliegue..."
-                fi
-                
+        run: |
+          STACK_STATUS=$(aws cloudformation describe-stacks --stack-name todo-stack --query "Stacks[0].StackStatus" --output text || echo "STACK_NOT_FOUND")
+          if [ "$STACK_STATUS" = "ROLLBACK_COMPLETE" ]; then
+            echo "La pila está en estado ROLLBACK_COMPLETE. Eliminando la pila..."
+            aws cloudformation delete-stack --stack-name todo-stack
+            echo "Esperando a que la pila se elimine completamente..."
+            aws cloudformation wait stack-delete-complete --stack-name todo-stack
+            echo "La pila ha sido eliminada."
+          else
+            echo "La pila no está en estado ROLLBACK_COMPLETE. Continuando con el despliegue..."
+          fi
+
       - name: Construir la aplicación
         run: SAM_CLI_TELEMETRY=0 sam build
 
