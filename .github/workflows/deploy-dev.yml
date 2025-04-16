@@ -21,6 +21,10 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::413600747077:role/github-actions-role
           aws-region: us-east-2
+      
+      - name: Verificar identidad asumida con AWS STS
+        run: aws sts get-caller-identity
+
 
       - name: Instalar Python 3.10
         uses: actions/setup-python@v4
