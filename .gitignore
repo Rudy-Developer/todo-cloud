@@ -174,3 +174,4 @@ cython_debug/
 .pypirc
 .aws-sam
 .github/workflows/deploy-dev.bk
+git_setup.sh

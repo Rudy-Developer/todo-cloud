@@ -9,7 +9,7 @@ Resources:
   TaskFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/lambdas/tasks/
+      CodeUri: src/lambdas/task/
       Handler: app.lambda_handler
       Role:  !Sub arn:aws:iam::413600747077:role/task-lambda-role-dev
       Events:
