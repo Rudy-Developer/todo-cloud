@@ -1,7 +1,7 @@
 # Variables
 STACK_NAME=todo-stack
 REGION=us-east-2
-S3_BUCKET=arn:aws:s3:::todo-cloud-demo
+S3_BUCKET="arn:aws:s3:::todo-cloud-demo"
 PROFILE=default
 TEMPLATE=template.yaml
 BUILD_DIR=.aws-sam/build

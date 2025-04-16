@@ -32,13 +32,14 @@ jobs:
 
       - name: Verificar versión de Python
         run: python --version
-        
+
       - name: Construir la aplicación
         run: SAM_CLI_TELEMETRY=0 sam build
 
       - name: Desplegar la aplicación
         run: |
           sam deploy --no-confirm-changeset --no-fail-on-empty-changeset \
+            --s3-bucket rn:aws:s3:::todo-cloud-demo \
             --stack-name todo-stack \
             --capabilities CAPABILITY_IAM \
             --region us-east-2
