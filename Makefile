@@ -1,7 +1,7 @@
 # Variables
 STACK_NAME=todo-stack
 REGION=us-east-2
-S3_BUCKET="arn:aws:s3:::todo-cloud-demo"
+S3_BUCKET=todo-cloud-demo
 PROFILE=default
 TEMPLATE=template.yaml
 BUILD_DIR=.aws-sam/build
@@ -35,7 +35,14 @@ deploy:
 		--capabilities CAPABILITY_IAM \
 		--region $(REGION) \
 		--profile $(PROFILE)
-
+# Eliminar la pila de CloudFormation
+undeploy:
+	SAM_CLI_TELEMETRY=0 sam delete \
+		--stack-name $(STACK_NAME) \
+		--region $(REGION) \
+		--profile $(PROFILE) \
+		--no-prompts
+		
 # Limpiar los artefactos de construcción
 clean:
 	rm -rf $(BUILD_DIR)

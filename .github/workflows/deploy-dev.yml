@@ -39,7 +39,7 @@ jobs:
       - name: Desplegar la aplicación
         run: |
           sam deploy --no-confirm-changeset --no-fail-on-empty-changeset \
-            --s3-bucket rn:aws:s3:::todo-cloud-demo \
+            --s3-bucket todo-cloud-demo \
             --stack-name todo-stack \
             --capabilities CAPABILITY_IAM \
             --region us-east-2
