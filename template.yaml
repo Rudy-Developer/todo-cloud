@@ -22,6 +22,6 @@ Resources:
   AttachmentFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/lambdas/attachments/
+      CodeUri: src/lambdas/attachements/
       Handler: app.lambda_handler
       Role:  !Sub arn:aws:iam::413600747077:role/attachments-lambda-role-dev
