@@ -11,7 +11,7 @@ Resources:
     Properties:
       CodeUri: src/lambdas/tasks/
       Handler: app.lambda_handler
-      Role: arn:aws:iam::${AWS::AccountId}:role/task-lambda-role-${Environment}
+      Role:  !Sub arn:aws:iam::413600747077:role/task-lambda-role-dev
       Events:
         TaskAPI:
           Type: Api
@@ -24,4 +24,4 @@ Resources:
     Properties:
       CodeUri: src/lambdas/attachments/
       Handler: app.lambda_handler
-      Role: arn:aws:iam::${AWS::AccountId}:role/attachments-lambda-role-${Environment}
+      Role:  !Sub arn:aws:iam::413600747077:role/attachments-lambda-role-dev

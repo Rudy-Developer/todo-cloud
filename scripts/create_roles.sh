@@ -20,3 +20,8 @@ aws iam put-role-policy \
   --role-name github-actions-role \
   --policy-name github-actions-policy \
   --policy-document file://github-actions-policy.json
+
+  aws iam create-open-id-connect-provider \
+  --url https://token.actions.githubusercontent.com \
+  --client-id-list sts.amazonaws.com \
+  --thumbprint-list <THUMBPRINT>
