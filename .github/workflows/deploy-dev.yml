@@ -19,7 +19,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: arn:aws:iam::413600747077:role/GitHubActionsRole-ToDo
+          role-to-assume: arn:aws:iam::413600747077:role/task-lambda-role-dev
           aws-region: us-east-2
 
       - name: Instalar Python 3.10
