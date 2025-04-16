@@ -26,7 +26,7 @@ jobs:
         uses: aws-actions/setup-sam@v1
 
       - name: Construir la aplicación
-        run: sam build
+        run: SAM_CLI_TELEMETRY=0 sam build
 
       - name: Desplegar la aplicación
         run: |
