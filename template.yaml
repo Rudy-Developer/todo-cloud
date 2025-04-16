@@ -8,7 +8,7 @@ Resources:
     Properties:
       FunctionName: TaskFunction
       Handler: task.app.lambda_handler
-      Runtime: python3.11
+      Runtime: python3.10
       CodeUri: src/lambdas/task/
       Description: Función Lambda de ejemplo
       MemorySize: 128
