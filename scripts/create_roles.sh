@@ -24,4 +24,4 @@ aws iam put-role-policy \
   aws iam create-open-id-connect-provider \
   --url https://token.actions.githubusercontent.com \
   --client-id-list sts.amazonaws.com \
-  --thumbprint-list <THUMBPRINT>
+  --thumbprint-list d89e3bd43d5d909b47a18977aa9d5ce36cee184c
