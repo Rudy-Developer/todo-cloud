@@ -25,6 +25,14 @@ jobs:
       - name: Instalar AWS SAM CLI
         uses: aws-actions/setup-sam@v1
 
+      - name: Instalar Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Verificar versión de Python
+        run: python --version
+        
       - name: Construir la aplicación
         run: SAM_CLI_TELEMETRY=0 sam build
 
