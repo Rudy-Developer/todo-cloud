@@ -9,6 +9,8 @@ Resources:
       FunctionName: TaskFunction
       Handler: task.app.lambda_handler
       Runtime: python3.10
+      Role: arn:aws:iam::413600747077:role/GitHubActionsRole
+      Policies: GitHubActionsRole-ToDoCreate-Role
       CodeUri: src/lambdas/task/
       Description: Función Lambda de ejemplo
       MemorySize: 128
