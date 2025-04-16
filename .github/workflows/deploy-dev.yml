@@ -1,0 +1,43 @@
+name: Deploy to Dev ToDo
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Clonar el repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar credenciales de AWS
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::413600747077:role/GitHubActionsRole-ToDo
+          aws-region: us-east-s
+
+      - name: Instalar AWS SAM CLI
+        uses: aws-actions/setup-sam@v1
+
+      - name: Construir la aplicación
+        run: sam build
+
+      - name: Desplegar la aplicación
+        run: |
+          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset \
+            --stack-name todo-stack \
+            --capabilities CAPABILITY_IAM \
+            --region us-east-2
+
+      - name: Obtener la URL de la API
+        run: |
+          aws cloudformation describe-stacks \
+            --stack-name todo-stack \
+            --query "Stacks[0].Outputs[?OutputKey=='ToDoApi'].OutputValue" \
+            --output text
