@@ -1,4 +1,4 @@
-name: Deploy to AWS
+name: Redeploy to AWS after rollback
 
 on:
   push:
@@ -16,15 +16,36 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v3
         with:
           role-to-assume: arn:aws:iam::413600747077:role/github-actions-role
           aws-region: us-east-2
-      
-      - name: Verificar identidad asumida con AWS STS
-        run: aws sts get-caller-identity
 
+      - name: Verificar si el stack está en ROLLBACK_COMPLETE
+        id: check_stack
+        run: |
+          STATUS=$(aws cloudformation describe-stacks \
+            --stack-name todo-stack \
+            --region us-east-2 \
+            --query "Stacks[0].StackStatus" \
+            --output text || echo "NOT_FOUND")
+
+          echo "Stack status: $STATUS"
+
+          if [[ "$STATUS" == "ROLLBACK_COMPLETE" ]]; then
+            echo "stack_needs_delete=true" >> $GITHUB_ENV
+          else
+            echo "stack_needs_delete=false" >> $GITHUB_ENV
+          fi
+
+      - name: Eliminar stack si es necesario
+        if: env.stack_needs_delete == 'true'
+        run: |
+          echo " Stack en ROLLBACK_COMPLETE. Eliminando..."
+          aws cloudformation delete-stack --stack-name todo-stack --region us-east-2
+          aws cloudformation wait stack-delete-complete --stack-name todo-stack --region us-east-2
+          echo " Stack eliminado"
 
       - name: Instalar Python 3.10
         uses: actions/setup-python@v4
@@ -34,12 +55,19 @@ jobs:
       - name: Verificar versión de Python
         run: python --version
 
-      - name: Install AWS SAM CLI
+      - name: Instalar AWS SAM CLI
         uses: aws-actions/setup-sam@v2
+
+      - name: Limpiar build previo
+        run: rm -rf .aws-sam
 
       - name: Build SAM
         run: SAM_CLI_TELEMETRY=0 sam build
 
       - name: Deploy to AWS
         run: |
-          sam deploy --config-env default --no-confirm-changeset --no-fail-on-empty-changeset
+          sam deploy \
+            --config-env default \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset \
+            --resolve-s3
