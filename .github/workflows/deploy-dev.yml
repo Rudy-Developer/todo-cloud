@@ -70,4 +70,4 @@ jobs:
             --config-env default \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset \
-            --resolve-s3
+
