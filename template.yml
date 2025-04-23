@@ -1,0 +1,66 @@
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description:  "API SAM con Lambda task y Lambda attachments usando un Layer común"
+
+Globals:
+  Function:
+    Timeout: 10
+    Runtime: python3.10
+    Layers:
+      - !Ref CommonLayer
+    Environment:
+      Variables:
+        STAGE: 
+          Ref: Stage
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - qa
+      - production
+    Description: Deploy environments (dev, qa, production)
+
+Resources:
+
+  ## LAYER COMÚN
+  CommonLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: common-layer
+      Description: shared layer code (utils, helpers, etc.)
+      ContentUri: layer/
+      CompatibleRuntimes:
+        - python3.10
+      RetentionPolicy: Retain
+
+  ## LAMBDA TASK (expone API Gateway)
+  TaskFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: 
+        Fn::Sub: "task-${Stage}"
+      CodeUri: src/task/
+      Handler: app.lambda_handler
+      Role:
+        Fn::Sub: arn:aws:iam::413600747077:role/task-lambda-role-${Stage}
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /task
+            Method: ANY
+
+  ## LAMBDA ATTACHMENTS (invocado desde Task)
+  AttachmentsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: 
+        Fn::Sub: "attach-${Stage}"
+      CodeUri: src/attach/
+      Handler: app.lambda_handler
+      Role:
+        Fn::Sub: arn:aws:iam::413600747077:role/attach-lambda-role-${Stage}
