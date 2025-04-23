@@ -41,7 +41,11 @@ jobs:
         run: |
           pip install aws-sam-cli
           sam --version
-
+      - name: create layer common layer
+        run: |
+          mkdir -p layer/python/common
+          cp -r src/common/* layer/python/common
+          
       - name: Build SAM
         run: |
           sam build
