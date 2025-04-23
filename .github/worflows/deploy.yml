@@ -1,0 +1,65 @@
+name: Deploy SAM Application
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - qa
+
+env:
+  AWS_REGION: us-east-2
+  STACK_NAME: todo-api-${{ github.ref_name }}
+  SAM_BUCKET: todo-sam-artifacts-${{ github.ref_name }}
+  STAGE: ${{ github.ref_name }}
+
+jobs:
+  deploy:
+    name: Deploy to AWS (${{ github.ref_name }})
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: arn:aws:iam::413600747077:role/github-actions-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          pip install aws-sam-cli
+          sam --version
+
+      - name: Build SAM
+        run: |
+          sam build
+
+      - name: Package SAM
+        run: |
+          sam package \
+            --s3-bucket $SAM_BUCKET \
+            --region $AWS_REGION \
+            --output-template-file packaged.yaml
+
+      - name: Deploy SAM
+        run: |
+          sam deploy \
+            --template-file packaged.yaml \
+            --stack-name $STACK_NAME \
+            --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND \
+            --parameter-overrides Stage=$STAGE \
+            --region $AWS_REGION \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset
